@@ -57,7 +57,7 @@ build=$(buildah from x237net/alpine-guix)
 
 GUIX_PROFILE="/root/.config/guix/current"
 GUIX_BUILD_GRP="guixbuild"
-GUIX_OPTS="--verbosity=2 --fallback"
+GUIX_OPTS="--verbosity=2"
 GUIX_IMG_NAME="guix-docker-image.tar.gz"
 GUIXSD_IMG_NAME="guixsd-docker-image.tar"
 

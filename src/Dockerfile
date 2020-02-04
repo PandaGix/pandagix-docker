@@ -55,7 +55,7 @@ FROM x237net/alpine-guix:latest AS build
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
 ARG GUIX_BUILD_GRP="guixbuild"
-ARG GUIX_OPTS="--verbosity=2 --fallback"
+ARG GUIX_OPTS="--verbosity=2"
 ARG GUIX_IMG_NAME="guix-docker-image.tar.gz"
 ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
 
