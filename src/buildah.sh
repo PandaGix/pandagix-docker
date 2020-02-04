@@ -108,13 +108,12 @@ do
 done
 " || exit ${?}
 
-# Link binary folders to system's profile.
-for _d in "bin" "sbin"
-do
-    try buildah run "${build}" -- rm -rf "${ROOT_D}/${_d}"
-    try buildah run "${build}" -- ln -s "/var/guix/profiles/system/profile/${_d}" \
-                                        "${ROOT_D}/${_d}"
-done
+# Link special required binaries.
+try buildah run "${build}" -- mkdir --parents "${ROOT_D}/usr/bin"
+try buildah run "${build}" -- ln -s "/var/guix/profiles/system/profile/bin/sh"  \
+                                    "${ROOT_D}/bin/sh"
+try buildah run "${build}" -- ln -s "/var/guix/profiles/system/profile/bin/env" \
+                                    "${ROOT_D}/usr/bin/env"
 
 # Set up init script.
 buildah run "${build}" -- sh -c "
@@ -163,6 +162,6 @@ try buildah run "${image}" -- "/busybox" rm -f "/busybox"
 buildah umount "${build}"
 
 buildah config --workingdir "${ENTRY_D}" "${image}"
-buildah config --entrypoint "/init"
+buildah config --entrypoint ["/init"]
 
 buildah commit --squash "${image}" "x237net/guixsd"

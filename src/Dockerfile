@@ -98,12 +98,10 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
     do                                                                          \
         tar -xf "${IMG_D}/${_layer}" --exclude "dev/*";                         \
     done                                                                        \
-    # Link binary folders to system's profile.
-    && for _d in "bin" "sbin";                                                  \
-       do                                                                       \
-           rm -rf "${_d}"                                                       \
-               && ln -s "/var/guix/profiles/system/profile/${_d}" "${_d}";      \
-       done                                                                     \
+    # Link special required binaries.
+    && mkdir --parents usr/bin                                                  \
+    && ln -s /var/guix/profiles/system/profile/bin/sh bin/sh                    \
+    && ln -s /var/guix/profiles/system/profile/bin/env usr/bin/env              \
     # Set up init script.
     && echo "#!/bin/sh" > "init"                                                \
     && jq -r ".config.env | .[]" "${IMG_D}/config.json" | while read _env;      \
@@ -142,4 +140,4 @@ RUN ["/busybox", "rm", "-f", "/busybox"]
 
 
 WORKDIR "${ENTRY_D}"
-ENTRYPOINT "/init"
+ENTRYPOINT ["/init"]

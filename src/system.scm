@@ -19,6 +19,8 @@
 ;; guixsd. If not, see <http://opensource.org/licenses/MIT>.
 ;;
 (use-modules (gnu))
+(use-modules (gnu services))
+
 (use-package-modules bash less linux nvi)
 
 
@@ -48,7 +50,15 @@
                  sed
                  tar))
 
- (services (list (service guix-service-type
-                          (guix-configuration
-                           (extra-options (list
-                                           "--disable-chroot")))))))
+ (services (list
+            ;; Install special files system wide.
+            (service special-files-service-type
+                     `(("/bin/sh" ,(file-append (canonical-package bash-minimal)
+                                                "/bin/sh"))
+                       ("/usr/bin/env" ,(file-append (canonical-package coreutils-minimal)
+                                                     "/bin/env"))))
+            ;; Disable ``chroot`` usage for the Guix daemon which requires
+            ;; a privileged container.
+            (service guix-service-type
+                     (guix-configuration
+                      (extra-options (list "--disable-chroot")))))))
