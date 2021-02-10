@@ -1,56 +1,28 @@
 # src/Dockerfile
 # ==============
-#
 # Copying
 # -------
-#
 # Copyright (c) 2020 x237net/guixsd authors.
+# Copyright (c) 2021 BambooGeek@PandaGix
 #
-# This file is part of the *x237net/guixsd* project.
-#
-# x237net/guixsd is a free software project. You can redistribute it and/or
+# You can redistribute it and/or
 # modify if under the terms of the MIT License.
 #
 # This software project is distributed *as is*, WITHOUT WARRANTY OF ANY
 # KIND; including but not limited to the WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE and NONINFRINGEMENT.
 #
-# You should have received a copy of the MIT License along with
-# x237net/guixsd. If not, see <http://opensource.org/licenses/MIT>.
+# You should have received a copy of the MIT License.
+# If not, see <http://opensource.org/licenses/MIT>.
 #
 
 # Layer 0: Welcome
 # ----------------
 
-FROM x237net/alpine-guix:latest AS welcome
-
-RUN echo                                                                        \
-    && echo "          ░░░                                     ░░░           "  \
-    && echo "          ░░▒▒░░░░░░░░░               ░░░░░░░░░▒▒░░             "  \
-    && echo "           ░░▒▒▒▒▒░░░░░░░           ░░░░░░░▒▒▒▒▒░               "  \
-    && echo "               ░▒▒▒░░▒▒▒▒▒         ░░░░░░░▒▒░                   "  \
-    && echo "                     ░▒▒▒▒░       ░░░░░░                        "  \
-    && echo "                      ▒▒▒▒▒      ░░░░░░                         "  \
-    && echo "                       ▒▒▒▒▒     ░░░░░                          "  \
-    && echo "                       ░▒▒▒▒▒   ░░░░░                           "  \
-    && echo "                        ▒▒▒▒▒   ░░░░░                           "  \
-    && echo "                         ▒▒▒▒▒ ░░░░░                            "  \
-    && echo "                         ░▒▒▒▒▒░░░░░                            "  \
-    && echo "                          ▒▒▒▒▒▒░░░                             "  \
-    && echo "                           ▒▒▒▒▒▒░                              "  \
-    && echo "     _____ _   _ _    _    _____       _        ___________     "  \
-    && echo "    / ____| \ | | |  | |  / ____|     (_)      / ____|  __ \    "  \
-    && echo "   | |  __|  \| | |  | | | |  __ _   _ ___  __| (___ | |  | |   "  \
-    && echo "   | | |_ | . ' | |  | | | | |_ | | | | \ \/ / \___ \| |  | |   "  \
-    && echo "   | |__| | |\  | |__| | | |__| | |_| | |>  <  ____) | |__| |   "  \
-    && echo "    \_____|_| \_|\____/   \_____|\__,_|_/_/\_\|_____/|_____/    "  \
-    && echo
-
-
 # Layer 1: Build
 # --------------
 
-FROM x237net/alpine-guix:latest AS build
+FROM pandagix/alpine-pandagix-docker:2021.0211.1 AS build
 
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
@@ -77,15 +49,28 @@ ENV USER="root"
 
 
 COPY system.scm "${WORK_D}/system.scm"
-RUN source "${GUIX_PROFILE}/etc/profile"                                        \
-    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
-    && "${GUIX_PROFILE}/bin/guix" gc                                            \
-    && "${GUIX_PROFILE}/bin/guix" pull ${GUIX_OPTS}                             \
-    && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade                \
+
+# RUN source "${GUIX_PROFILE}/etc/profile"                                        \
+#    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
+#    && "${GUIX_PROFILE}/bin/guix" gc                                            \
+#    && "${GUIX_PROFILE}/bin/guix" pull ${GUIX_OPTS}                             \
+#    && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade                \
+#    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
+#             "${WORK_D}/${GUIX_IMG_NAME}"
+
+# since pandagix/alpine-pandagix-docker:2021.0211.1 is used,
+# guix pull is not needed, hash guix is needed.
+
+RUN source "${GUIX_PROFILE}/etc/profile" \
+    && hash guix \
+    && "${GUIX_PROFILE}/bin/guix" gc \
+    && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
     && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
              "${WORK_D}/${GUIX_IMG_NAME}"
 
 
+# Layer 2: Prepare Image
+# --------------
 # Prepare final image
 # ^^^^^^^^^^^^^^^^^^^
 
@@ -118,7 +103,7 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
     && tar -cf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 
-# Layer 2: Image
+# Layer 3: Deploy Image
 # --------------
 
 FROM scratch

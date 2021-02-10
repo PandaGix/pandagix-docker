@@ -25,7 +25,7 @@
 
 
 (operating-system
- (host-name "guixsd")
+ (host-name "PandaGixDocker")
  (locale "en_US.utf8")
  (timezone "UTC")
 

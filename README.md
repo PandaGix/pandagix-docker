@@ -1,14 +1,14 @@
-x237net/guixsd
+PandaGix-Docker
 ==============
 
-A minimal Docker image based on GNU Guix Software Distribution (GuixSD).
+A costomized Docker image based on GNU Guix Software Distribution (GuixSD).
 
 
 Licensing
 ---------
 
 This software project is provided under the licensing terms of the
-MIT License stated in the file ``LICENSE.rst``.
+MIT License stated in the file ``LICENSE.md``.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
