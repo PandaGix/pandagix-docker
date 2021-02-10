@@ -62,6 +62,7 @@ COPY system.scm "${WORK_D}/system.scm"
 # guix pull is not needed, hash guix is needed.
 
 RUN source "${GUIX_PROFILE}/etc/profile" \
+    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
     && hash guix \
     && "${GUIX_PROFILE}/bin/guix" gc \
     && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
