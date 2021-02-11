@@ -17,7 +17,7 @@
 # Layer 1: Build
 # --------------
 
-FROM x237net/guixsd:latest AS build
+FROM metacall/guix:latest AS build
 
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
@@ -44,7 +44,7 @@ COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
 #    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
 #             "${WORK_D}/${GUIX_IMG_NAME}"
 
-# since x237net/guixsd:latest is used,
+# since metacall/guix:latest is used,
 # guix pull is needed, hash guix is needed.
 
 # RUN cat "${GUIX_CONFIG}/channels.scm"\
