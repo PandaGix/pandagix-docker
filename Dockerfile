@@ -31,6 +31,15 @@ ARG IMG_D="${WORK_D}/image"
 ARG ROOT_D="${WORK_D}/root"
 
 
+# Alpine Package requirements
+# ^^^^^^^^^^^^^^^^^^^^
+
+RUN apk add --no-cache busybox-static jq
+
+
+# Build GuixSD Docker Image
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
+
 ENV USER="root"
 
 COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
@@ -44,8 +53,8 @@ COPY scripts/system.scm "${WORK_D}/system.scm"
 #    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
 #             "${WORK_D}/${GUIX_IMG_NAME}"
 
-# since metacall/guix:latest is used,
-# guix pull is needed, hash guix is needed.
+# since pandagix/alpine-pandagix-docker:2021.0211.1 is used,
+# guix pull is NOT needed, hash guix is needed.
 
 # RUN cat "${GUIX_CONFIG}/channels.scm"\
 #    && source "${GUIX_PROFILE}/etc/profile" \
