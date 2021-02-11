@@ -56,12 +56,66 @@ RUN source "${GUIX_PROFILE}/etc/profile" \
     && "${GUIX_PROFILE}/bin/guix" gc \
     && "${GUIX_PROFILE}/bin/guix" pull \
     && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
-RUN source "${GUIX_PROFILE}/etc/profile" \
-    && hash guix \
-    && "${GUIX_PROFILE}/bin/guix" --version \
-    && "${GUIX_PROFILE}/bin/guix" describe \ 
-    && "${GUIX_PROFILE}/bin/guix" gc \
-    && "${GUIX_PROFILE}/bin/guix" gc --optimize
+    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
+             "${WORK_D}/${GUIX_IMG_NAME}"
+
+
+# Layer 2: Prepare Image
+# --------------
+# Prepare final image
+# ^^^^^^^^^^^^^^^^^^^
+
+# Extract Docker image.
+WORKDIR "${IMG_D}"
+RUN tar -xzvf "${WORK_D}/${GUIX_IMG_NAME}"
+
+# Recreate root structure by extracting each layers.
+WORKDIR "${ROOT_D}"
+RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     \
+    do                                                                          \
+        tar -xf "${IMG_D}/${_layer}" --exclude "dev/*";                         \
+    done                                                                        \
+    # Link special required binaries.
+    && mkdir --parents usr/bin                                                  \
+    && ln -s /var/guix/profiles/system/profile/bin/sh bin/sh                    \
+    && ln -s /var/guix/profiles/system/profile/bin/env usr/bin/env              \
+    # Set up init script.
+    && echo "#!/bin/sh" > "init"                                                \
+    && jq -r ".config.env | .[]" "${IMG_D}/config.json" | while read _env;      \
+       do                                                                       \
+           echo "export ${_env}" >> "init";                                     \
+       done                                                                     \
+    && echo "export GUIX_PROFILE=/var/guix/profiles/system/profile" >> "init"   \
+    && echo "export PATH=\${GUIX_PROFILE}/bin:\${PATH:+:}\${PATH}" >> "init"    \
+    && echo ". \${GUIX_PROFILE}/etc/profile" >> "init"                          \
+    && echo "exec $(jq -r '.config.entrypoint | join(" ")' ${IMG_D}/config.json)" >> "init" \
+    && chmod 0500 "init"                                                        \
+    # Archive final root structure for next layer.
+    && /bin/busybox.static tar -cf "${WORK_D}/${GUIXSD_IMG_NAME}" .
+
+
+
+# Layer 3: Deploy Image
+# --------------
+
+FROM scratch
+
+ARG ENTRY_D=/root
+
+ENV USER="root"
+
+# We need BusyBox in order to unpack the filesystem.
+COPY --from=build "/bin/busybox.static" "/busybox"
+
+# Deploy filesystem.
+WORKDIR /
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
+RUN ["/busybox", "tar", "-xf", "/root.tar"]
+RUN ["/busybox", "rm", "-f", "/root.tar"]
+RUN ["/busybox", "rm", "-f", "/busybox"]
+
+
+# Final steps
 
 WORKDIR "${ENTRY_D}"
 ENTRYPOINT ["/init"]
