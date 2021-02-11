@@ -48,15 +48,15 @@ COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
 # guix pull is needed, hash guix is needed.
 
 # RUN cat "${GUIX_CONFIG}/channels.scm"\
-RUN \
-    && source "${GUIX_PROFILE}/etc/profile" \
+#    && source "${GUIX_PROFILE}/etc/profile" \
+RUN source "${GUIX_PROFILE}/etc/profile" \
     && hash guix \
     && "${GUIX_PROFILE}/bin/guix" --version \
     && "${GUIX_PROFILE}/bin/guix" describe \
     && "${GUIX_PROFILE}/bin/guix" gc \
     && "${GUIX_PROFILE}/bin/guix" pull \
     && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
-    && source "${GUIX_PROFILE}/etc/profile" \
+RUN source "${GUIX_PROFILE}/etc/profile" \
     && hash guix \
     && "${GUIX_PROFILE}/bin/guix" --version \
     && "${GUIX_PROFILE}/bin/guix" describe \ 
