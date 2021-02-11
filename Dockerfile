@@ -47,7 +47,8 @@ COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
 # since x237net/guixsd:latest is used,
 # guix pull is needed, hash guix is needed.
 
-RUN cat "${GUIX_CONFIG}/channels.scm"\
+# RUN cat "${GUIX_CONFIG}/channels.scm"\
+RUN \
     && source "${GUIX_PROFILE}/etc/profile" \
     && hash guix \
     && "${GUIX_PROFILE}/bin/guix" --version \
