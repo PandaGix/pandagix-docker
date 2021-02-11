@@ -111,7 +111,7 @@ FROM scratch
 
 
 ARG ENTRY_D="/root"
-ARG ROOT_IMG="/rootimage.tar.xz"
+
 
 ENV USER="root"
 
@@ -121,9 +121,9 @@ COPY --from=build "/bin/busybox.static" "/busybox"
 
 # Deploy filesystem.
 WORKDIR /
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "${ROOT_IMG}"
-RUN ["/busybox", "tar", "-xjf", "${ROOT_IMG}"]
-RUN ["/busybox", "rm", "-f", "${ROOT_IMG}"]
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/rootimage.tar"
+RUN ["/busybox", "tar", "-xjf", "/rootimage.tar"]
+RUN ["/busybox", "rm", "-f", "/rootimage.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
 
