@@ -31,7 +31,7 @@ ARG GUIX_OPTS="--verbosity=2"
 ARG GUIX_IMG_NAME="guix-docker-image.tar.gz"
 ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
 
-ARG WORK_D=/tmp
+ARG WORK_D="/tmp"
 ARG IMG_D="${WORK_D}/image"
 ARG ROOT_D="${WORK_D}/root"
 
@@ -110,7 +110,8 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
 FROM scratch
 
 
-ARG ENTRY_D=/root
+ARG ENTRY_D="/root"
+ARG ROOT_IMG="/rootimage.tar.xz"
 
 ENV USER="root"
 
@@ -120,9 +121,9 @@ COPY --from=build "/bin/busybox.static" "/busybox"
 
 # Deploy filesystem.
 WORKDIR /
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN ["/busybox", "tar", "-xj", "-f", "/root.tar"]
-RUN ["/busybox", "rm", "-f", "/root.tar"]
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "${ROOT_IMG}"
+RUN ["/busybox", "tar", "-xjf", "${ROOT_IMG}"]
+RUN ["/busybox", "rm", "-f", "${ROOT_IMG}"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
 
