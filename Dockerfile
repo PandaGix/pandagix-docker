@@ -17,7 +17,7 @@
 # Layer 1: Build
 # --------------
 
-FROM metacall/guix:latest AS build
+FROM pandagix/alpine-pandagix-docker:2021.0211.1 AS build
 
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
@@ -50,6 +50,7 @@ COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
 # RUN cat "${GUIX_CONFIG}/channels.scm"\
 #    && source "${GUIX_PROFILE}/etc/profile" \
 RUN source "${GUIX_PROFILE}/etc/profile" \
+    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
     && hash guix \
     && "${GUIX_PROFILE}/bin/guix" --version \
     && "${GUIX_PROFILE}/bin/guix" describe \
