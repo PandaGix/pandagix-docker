@@ -91,6 +91,7 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
     && echo "exec $(jq -r '.config.entrypoint | join(" ")' ${IMG_D}/config.json)" >> "init" \
     && chmod 0500 "init"                                                        \
     # Archive final root structure for next layer.
+    # Using the busybox.static tar
     && /bin/busybox.static tar -cf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 
