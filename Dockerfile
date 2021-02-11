@@ -34,7 +34,7 @@ ARG ROOT_D="${WORK_D}/root"
 ENV USER="root"
 
 COPY scripts/channels.scm "${GUIX_CONFIG}/channels.scm"
-COPY system.scm "${WORK_D}/system.scm"
+COPY scripts/system.scm "${WORK_D}/system.scm"
 
 # RUN source "${GUIX_PROFILE}/etc/profile"                                        \
 #    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
