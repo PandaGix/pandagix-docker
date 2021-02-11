@@ -101,7 +101,7 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
     && echo "exec $(jq -r '.config.entrypoint | join(" ")' ${IMG_D}/config.json)" >> "init" \
     && chmod 0500 "init"                                                        \
     # Archive final root structure for next layer.
-    && tar -czf "${WORK_D}/${GUIXSD_IMG_NAME}" .
+    && tar -cjf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 
 # Layer 3: Deploy Image
@@ -121,7 +121,7 @@ COPY --from=build "/bin/busybox.static" "/busybox"
 # Deploy filesystem.
 WORKDIR /
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN ["/busybox", "tar", "-xz", "-f", "/root.tar"]
+RUN ["/busybox", "tar", "-xj", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
