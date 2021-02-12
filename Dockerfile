@@ -39,7 +39,7 @@ ARG INIT_D=/etc/init.d
 # busybox-tar step moved to Layer 2.1, pay attention to WORKDIR
 # Layer 2.1
 WORKDIR "${ROOT_D}"
-RUN /bin/busybox.static tar -cjvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
+RUN /bin/busybox.static tar -cJvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 
 # Layer 3: Deploy Image
@@ -57,7 +57,7 @@ COPY --from=build "/bin/busybox.static" "/busybox"
 # Deploy filesystem.
 WORKDIR /
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN ["/busybox", "tar", "-xjvf", "/root.tar"]
+RUN ["/busybox", "tar", "-xJvf", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
