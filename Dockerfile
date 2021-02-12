@@ -65,8 +65,9 @@ RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     
     && echo "export PATH=\${GUIX_PROFILE}/bin:\${PATH:+:}\${PATH}" >> "init"    \
     && echo ". \${GUIX_PROFILE}/etc/profile" >> "init"                          \
     && echo "exec $(jq -r '.config.entrypoint | join(" ")' ${IMG_D}/config.json)" >> "init" \
-    && chmod 0500 "init"                                                        \
-    # busybox-tar step moved to Layer 3, pay attention to WORKDIR
+    && chmod 0500 "init"
+
+# busybox-tar step moved to Layer 3, pay attention to WORKDIR
 
 # Final steps
 
