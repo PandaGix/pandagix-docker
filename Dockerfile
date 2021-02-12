@@ -17,7 +17,7 @@
 # Layer 1.1: Post Build reuse ARGs
 # --------------
 
-FROM pandagix/pandagix-docker:2020.0212.1pa AS build
+FROM pandagix/pandagix-docker:2020.0212.2pa AS build
 # AS build should be keeped for Layer 3 to copy busybox.static
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
