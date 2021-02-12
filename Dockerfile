@@ -53,7 +53,7 @@ ARG ENTRY_D=/root
 ENV USER="root"
 
 # We need BusyBox in order to unpack the filesystem.
-#COPY --from=build "/bin/busybox.static" "/busybox"
+COPY --from=build "/bin/busybox.static" "/busybox"
 
 # Deploy filesystem.
 WORKDIR /
