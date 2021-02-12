@@ -24,7 +24,7 @@ ARG GUIX_PROFILE="/root/.config/guix/current"
 ARG GUIX_BUILD_GRP="guixbuild"
 ARG GUIX_OPTS="--verbosity=2"
 ARG GUIX_IMG_NAME="guix-docker-image.tar.gz"
-ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
+ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar.xz"
 
 ARG WORK_D="/tmp"
 ARG IMG_D="${WORK_D}/image"
@@ -39,6 +39,7 @@ ARG INIT_D=/etc/init.d
 # busybox-tar step moved to Layer 2.1, pay attention to WORKDIR
 # Layer 2.1
 WORKDIR "${ROOT_D}"
+# using tar -J here in order to use Docker ADD, pay attention to GUIXSD_IMG_NAME
 RUN /bin/busybox.static tar -cJvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 
@@ -52,14 +53,15 @@ ARG ENTRY_D=/root
 ENV USER="root"
 
 # We need BusyBox in order to unpack the filesystem.
-COPY --from=build "/bin/busybox.static" "/busybox"
+#COPY --from=build "/bin/busybox.static" "/busybox"
 
 # Deploy filesystem.
 WORKDIR /
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN ["/busybox", "tar", "-xJvf", "/root.tar"]
-RUN ["/busybox", "rm", "-f", "/root.tar"]
-RUN ["/busybox", "rm", "-f", "/busybox"]
+# using ADD here, do NOT need busybox-tar any more
+ADD --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/"
+#RUN ["/busybox", "tar", "-xJvf", "/root.tar"]
+#RUN ["/busybox", "rm", "-f", "/root.tar"]
+#RUN ["/busybox", "rm", "-f", "/busybox"]
 
 
 # Final steps
