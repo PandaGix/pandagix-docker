@@ -58,9 +58,11 @@ COPY --from=build "/bin/busybox.static" "/busybox"
 
 # Deploy filesystem.
 WORKDIR /
-# NOT using ADD here, DO need busybox-tar
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN ["/busybox", "tar", "x", "-f", "/root.tar"]
+# if DO using ADD here, NOT using busybox-tar
+ADD "/root.tar" "/"
+# if NOT using ADD here, DO need busybox-tar
+#RUN ["/busybox", "tar", "x", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
