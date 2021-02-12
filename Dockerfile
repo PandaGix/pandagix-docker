@@ -36,40 +36,33 @@ ARG PROFILE_D=/etc/profile.d
 ARG INIT_D=/etc/init.d
 
 
-# Layer 2: Prepare Image
-# --------------
-# Prepare final image
-# ^^^^^^^^^^^^^^^^^^^
-
-# Extract Docker image.
-WORKDIR "${IMG_D}"
-RUN tar -xzvf "${WORK_D}/${GUIX_IMG_NAME}"
-
-# Recreate root structure by extracting each layers.
+# busybox-tar step moved to Layer 2.1, pay attention to WORKDIR
+# Layer 2.1
 WORKDIR "${ROOT_D}"
-RUN jq -r ".[0].Layers | .[]" "${IMG_D}/manifest.json" | while read _layer;     \
-    do                                                                          \
-        tar -xf "${IMG_D}/${_layer}" --exclude "dev/*";                         \
-    done                                                                        \
-    # Link special required binaries.
-    && mkdir --parents usr/bin                                                  \
-    && ln -s /var/guix/profiles/system/profile/bin/sh bin/sh                    \
-    && ln -s /var/guix/profiles/system/profile/bin/env usr/bin/env              \
-    # Set up init script.
-    && echo "#!/bin/sh" > "init"                                                \
-    && jq -r ".config.env | .[]" "${IMG_D}/config.json" | while read _env;      \
-       do                                                                       \
-           echo "export ${_env}" >> "init";                                     \
-       done                                                                     \
-    && echo "export GUIX_PROFILE=/var/guix/profiles/system/profile" >> "init"   \
-    && echo "export PATH=\${GUIX_PROFILE}/bin:\${PATH:+:}\${PATH}" >> "init"    \
-    && echo ". \${GUIX_PROFILE}/etc/profile" >> "init"                          \
-    && echo "exec $(jq -r '.config.entrypoint | join(" ")' ${IMG_D}/config.json)" >> "init" \
-    && chmod 0500 "init"
+RUN /bin/busybox.static tar -cjvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
-# busybox-tar step moved to Layer 3, pay attention to WORKDIR
+
+# Layer 3: Deploy Image
+# --------------
+
+FROM scratch
+
+ARG ENTRY_D=/root
+
+ENV USER="root"
+
+# We need BusyBox in order to unpack the filesystem.
+COPY --from=build "/bin/busybox.static" "/busybox"
+
+# Deploy filesystem.
+WORKDIR /
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
+RUN ["/busybox", "tar", "-xjvf", "/root.tar"]
+RUN ["/busybox", "rm", "-f", "/root.tar"]
+RUN ["/busybox", "rm", "-f", "/busybox"]
+
 
 # Final steps
 
 WORKDIR "${ENTRY_D}"
-CMD "/sbin/init"
+ENTRYPOINT ["/init"]
