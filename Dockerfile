@@ -24,7 +24,7 @@ ARG GUIX_PROFILE="/root/.config/guix/current"
 ARG GUIX_BUILD_GRP="guixbuild"
 ARG GUIX_OPTS="--verbosity=2"
 ARG GUIX_IMG_NAME="guix-docker-image.tar.gz"
-ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
+ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar.gz"
 
 ARG WORK_D="/tmp"
 ARG IMG_D="${WORK_D}/image"
@@ -42,7 +42,7 @@ ARG INIT_D=/etc/init.d
 WORKDIR "${ROOT_D}"
 
 #RUN /bin/busybox.static tar --help
-RUN tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
+RUN tar c -zvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 # Layer 3: Deploy Image
 # --------------
@@ -59,8 +59,8 @@ WORKDIR /
 RUN apk add --no-cache busybox-static tar
 # Deploy filesystem.
 #WORKDIR /
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN tar x -f "/root.tar" 
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar.gz"
+RUN tar x -zvf "/root.tar.gz" 
 #RUN /bin/busybox.static tar x -f "/root.tar" 
 # if DO using ADD here, NOT using busybox-tar
 #ADD "/root.tar" "/"
