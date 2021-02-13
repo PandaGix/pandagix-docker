@@ -24,7 +24,7 @@ ARG GUIX_PROFILE="/root/.config/guix/current"
 ARG GUIX_BUILD_GRP="guixbuild"
 ARG GUIX_OPTS="--verbosity=2"
 ARG GUIX_IMG_NAME="guix-docker-image.tar.gz"
-ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar.gz"
+ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
 
 ARG WORK_D="/tmp"
 ARG IMG_D="${WORK_D}/image"
@@ -42,25 +42,25 @@ ARG INIT_D=/etc/init.d
 WORKDIR "${ROOT_D}"
 
 #RUN /bin/busybox.static tar --help
-RUN tar c -zvf "${WORK_D}/${GUIXSD_IMG_NAME}" .
+RUN tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 # Layer 3: Deploy Image
 # --------------
 
-FROM alpine:3.12.3 AS deploy
+#FROM alpine:3.12.3 AS deploy
+FROM scratch AS deploy
 
 ARG ENTRY_D=/root
 
 ENV USER="root"
 
-WORKDIR /
 # We need BusyBox in order to unpack the filesystem.
 #COPY --from=build "/bin/busybox.static" "/busybox"
-RUN apk add --no-cache busybox-static tar
+#RUN apk add --no-cache busybox-static tar
 # Deploy filesystem.
 #WORKDIR /
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar.gz"
-RUN tar x -zvf "/root.tar.gz" 
+#COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
+#RUN tar x -f "/root.tar" 
 #RUN /bin/busybox.static tar x -f "/root.tar" 
 # if DO using ADD here, NOT using busybox-tar
 #ADD "/root.tar" "/"
@@ -70,9 +70,10 @@ RUN tar x -zvf "/root.tar.gz"
 #RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
 #RUN ["/busybox", "rm", "-f", "/root.tar"]
 #RUN ["/busybox", "rm", "-f", "/busybox"]
-RUN rm -f "/root.tar"
+#RUN rm -f "/root.tar"
 
 # Final steps
-
+WORKDIR /
+COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/"
 WORKDIR "${ENTRY_D}"
 ENTRYPOINT ["/init"]
