@@ -42,7 +42,7 @@ ARG INIT_D=/etc/init.d
 WORKDIR "${ROOT_D}"
 
 RUN /bin/busybox.static tar --help
-RUN /bin/busybox.static tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
+RUN /bin/busybox.static tar c -zf "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 # Layer 3: Deploy Image
 # --------------
@@ -65,7 +65,7 @@ COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
 # if NOT using ADD here, DO need busybox-tar
 RUN ["/busybox", "tar", "--help"]
 RUN ["/busybox", "ls", "-a", "/"]
-RUN ["/busybox", "tar", "x", "-f", "/root.tar"]
+RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
 
