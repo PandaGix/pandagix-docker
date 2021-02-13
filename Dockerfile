@@ -60,8 +60,8 @@ RUN apk add --no-cache busybox-static tar
 # Deploy filesystem.
 #WORKDIR /
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN tar t -f "/root.tar" 
-RUN /bin/busybox.static tar x -f "/root.tar" 
+RUN tar x -f "/root.tar" 
+#RUN /bin/busybox.static tar x -f "/root.tar" 
 # if DO using ADD here, NOT using busybox-tar
 #ADD "/root.tar" "/"
 # if NOT using ADD here, DO need busybox-tar
@@ -70,7 +70,7 @@ RUN /bin/busybox.static tar x -f "/root.tar"
 #RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
 #RUN ["/busybox", "rm", "-f", "/root.tar"]
 #RUN ["/busybox", "rm", "-f", "/busybox"]
-
+RUN rm -f "/root.tar"
 
 # Final steps
 
