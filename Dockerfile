@@ -41,8 +41,8 @@ ARG INIT_D=/etc/init.d
 
 WORKDIR "${ROOT_D}"
 
-RUN /bin/busybox.static tar --help
-RUN /bin/busybox.static tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
+#RUN /bin/busybox.static tar --help
+RUN tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 # Layer 3: Deploy Image
 # --------------
@@ -56,11 +56,11 @@ ENV USER="root"
 WORKDIR /
 # We need BusyBox in order to unpack the filesystem.
 #COPY --from=build "/bin/busybox.static" "/busybox"
-RUN apk add --no-cache busybox-static
+RUN apk add --no-cache busybox-static tar
 # Deploy filesystem.
 #WORKDIR /
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-RUN /bin/busybox.static tar t -f "/root.tar" 
+RUN tar t -f "/root.tar" 
 RUN /bin/busybox.static tar x -f "/root.tar" 
 # if DO using ADD here, NOT using busybox-tar
 #ADD "/root.tar" "/"
