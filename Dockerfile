@@ -1,24 +1,11 @@
-# src/Dockerfile
-# ==============
-# Copying
-# -------
-# Copyright (c) 2020 x237net/guixsd authors.
-# Copyright (c) 2021 BambooGeek@PandaGix
-#
-# You can redistribute it and/or
-# modify if under the terms of the MIT License.
-# This software project is distributed *as is*, WITHOUT WARRANTY OF ANY
-# KIND; including but not limited to the WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE and NONINFRINGEMENT.
-# You should have received a copy of the MIT License.
-# If not, see <http://opensource.org/licenses/MIT>.
-
-
-# Layer 1.1: Post Build reuse ARGs
+# Layer 1: Build
 # --------------
 
-FROM pandagix/pandagix-docker:2020.0212.2pa AS build
-# AS build should be keeped for Layer 3 to copy busybox.static
+#FROM alpine:3.12.3 AS build
+FROM pandagix/alpine-pandagix-docker:279889 AS build
+# guix channel commit dffc918, used for ci.guix.gnu.org Build ID 279889, date 20200206
+# nonguix channel commit 73b11e7, linux 5.10.14 and 5.4.96, date 20200208
+
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
 ARG GUIX_BUILD_GRP="guixbuild"
@@ -29,53 +16,46 @@ ARG GUIXSD_IMG_NAME="guixsd-docker-image.tar"
 ARG WORK_D="/tmp"
 ARG IMG_D="${WORK_D}/image"
 ARG ROOT_D="${WORK_D}/root"
-ARG ENTRY_D=/root
-#added as 2-phase arg
+
+#added as 3-phase arg
 ARG PREFIX_D=/usr/local
 ARG PROFILE_D=/etc/profile.d
 ARG INIT_D=/etc/init.d
-
-
-# busybox-tar step moved to Layer 2.1, pay attention to WORKDIR
-# Layer 2.1
-
-WORKDIR "${ROOT_D}"
-
-#RUN /bin/busybox.static tar --help
-RUN tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
-
-# Layer 3: Deploy Image
-# --------------
-
-#FROM alpine:3.12.3 AS deploy
-FROM scratch
-
 ARG ENTRY_D=/root
+
+
+# Alpine Package requirements
+# ^^^^^^^^^^^^^^^^^^^^
+
+#RUN apk add --no-cache ca-certificates openrc wget git
+#already in pandagix/alpine-pandagix-docker:279889
+RUN apk add --no-cache busybox-static jq tar
+
+
+# Build GuixSD Docker Image
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ENV USER="root"
 
-# We need BusyBox in order to unpack the filesystem.
-#COPY --from=build "/bin/busybox.static" "/busybox"
-#RUN apk add --no-cache busybox-static tar
-# Deploy filesystem.
-#WORKDIR /
-#COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
-#RUN tar x -f "/root.tar" 
-#RUN /bin/busybox.static tar x -f "/root.tar" 
-# if DO using ADD here, NOT using busybox-tar
-#ADD "/root.tar" "/"
-# if NOT using ADD here, DO need busybox-tar
-#RUN ["/busybox", "tar", "--help"]
-#RUN ["/busybox", "ls", "-a", "/"]
-#RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
-#RUN ["/busybox", "rm", "-f", "/root.tar"]
-#RUN ["/busybox", "rm", "-f", "/busybox"]
-#RUN rm -f "/root.tar"
+#COPY scripts/channels.scm-279989 "${GUIX_CONFIG}/channels.scm"
+COPY scripts/system.scm "${WORK_D}/system.scm"
+
+# since pandagix/alpine-pandagix-docker:279889 is used,
+# guix pull is NOT needed, hash guix is needed.
+
+RUN source "${GUIX_PROFILE}/etc/profile" \
+    && sh -c "'${GUIX_PROFILE}/bin/guix-daemon' --build-users-group='${GUIX_BUILD_GRP}' --disable-chroot &" \
+    && hash guix \
+    && "${GUIX_PROFILE}/bin/guix" --version \
+    && "${GUIX_PROFILE}/bin/guix" describe \
+    && "${GUIX_PROFILE}/bin/guix" gc \
+    #&& "${GUIX_PROFILE}/bin/guix" pull \
+    #&& "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
+    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
+             "${WORK_D}/${GUIX_IMG_NAME}"
+
 
 # Final steps
-WORKDIR /
-# do not know why, but COPY command used in Dockerfile with Docker Autobuild (date 20210213) actually extract .tar files 
-# and the following command produice a successful container
-COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/"
+
 WORKDIR "${ENTRY_D}"
-ENTRYPOINT ["/init"]
+CMD "/sbin/init"
