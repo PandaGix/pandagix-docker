@@ -42,12 +42,12 @@ ARG INIT_D=/etc/init.d
 WORKDIR "${ROOT_D}"
 
 RUN /bin/busybox.static tar --help
-RUN /bin/busybox.static tar c -zf "${WORK_D}/${GUIXSD_IMG_NAME}" .
+RUN /bin/busybox.static tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
 
 # Layer 3: Deploy Image
 # --------------
 
-FROM scratch
+FROM alpine:3.12.3 AS deploy
 
 ARG ENTRY_D=/root
 
@@ -55,19 +55,20 @@ ENV USER="root"
 
 WORKDIR /
 # We need BusyBox in order to unpack the filesystem.
-COPY --from=build "/bin/busybox.static" "/busybox"
-
+#COPY --from=build "/bin/busybox.static" "/busybox"
+RUN apk add --no-cache busybox-static
 # Deploy filesystem.
 #WORKDIR /
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
+RUN /bin/busybox.static tar x -f "/root.tar" 
 # if DO using ADD here, NOT using busybox-tar
 #ADD "/root.tar" "/"
 # if NOT using ADD here, DO need busybox-tar
-RUN ["/busybox", "tar", "--help"]
-RUN ["/busybox", "ls", "-a", "/"]
-RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
-RUN ["/busybox", "rm", "-f", "/root.tar"]
-RUN ["/busybox", "rm", "-f", "/busybox"]
+#RUN ["/busybox", "tar", "--help"]
+#RUN ["/busybox", "ls", "-a", "/"]
+#RUN ["/busybox", "tar", "x", "-zf", "/root.tar"]
+#RUN ["/busybox", "rm", "-f", "/root.tar"]
+#RUN ["/busybox", "rm", "-f", "/busybox"]
 
 
 # Final steps
