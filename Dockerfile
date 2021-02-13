@@ -64,6 +64,7 @@ COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/root.tar"
 #ADD "/root.tar" "/"
 # if NOT using ADD here, DO need busybox-tar
 RUN ["/busybox", "tar", "--help"]
+RUN ["/busybox", "ls", "-a", "/"]
 RUN ["/busybox", "tar", "x", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/root.tar"]
 RUN ["/busybox", "rm", "-f", "/busybox"]
