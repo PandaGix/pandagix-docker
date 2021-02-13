@@ -38,7 +38,7 @@ RUN apk add --no-cache busybox-static jq tar
 ENV USER="root"
 
 #COPY scripts/channels.scm-279989 "${GUIX_CONFIG}/channels.scm"
-COPY scripts/system.scm "${WORK_D}/system.scm"
+COPY scripts/system.scm-with-nss "${WORK_D}/system.scm"
 
 # since pandagix/alpine-pandagix-docker:279889 is used,
 # guix pull is NOT needed, hash guix is needed.
