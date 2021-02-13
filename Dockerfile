@@ -48,7 +48,7 @@ RUN tar c -f "${WORK_D}/${GUIXSD_IMG_NAME}" .
 # --------------
 
 #FROM alpine:3.12.3 AS deploy
-FROM scratch AS deploy
+FROM scratch
 
 ARG ENTRY_D=/root
 
@@ -74,6 +74,8 @@ ENV USER="root"
 
 # Final steps
 WORKDIR /
+# do not know why, but COPY command used in Dockerfile with Docker Autobuild (date 20210213) actually extract .tar files 
+# and the following command produice a successful container
 COPY --from=build "${WORK_D}/${GUIXSD_IMG_NAME}" "/"
 WORKDIR "${ENTRY_D}"
 ENTRYPOINT ["/init"]
