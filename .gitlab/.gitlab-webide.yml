@@ -1,6 +1,8 @@
 terminal:
+  image: alpine:3.12.3
+ 
   # This can be any image that has the necessary runtime environment for your project.
-  image: pandagix/alpine-pandagix-docker:279889
+ # image: pandagix/alpine-pandagix-docker:279889
   #before_script:
   #  - apt-get update
   #script: sleep 60
