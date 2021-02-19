@@ -10,6 +10,7 @@
   #:use-module ((guix store) #:select (%store-prefix))
   #:use-module (gnu installer)
   #:use-module (gnu system locale)
+  #:use-module (gnu services)
   #:use-module (gnu services avahi)
   #:use-module (gnu services dbus)
   #:use-module (gnu services networking)
@@ -29,7 +30,9 @@
   #:use-module (gnu packages xorg)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-26)
-
+  ;;;;added for docker
+  #:use-module (gnu packages less)
+  #:use-module (gnu packages nvi)
   ;;;;added for non-libre linux
   #:use-module (nongnu packages linux) ; channel inferior
   #:use-module (nongnu system linux-initrd)
