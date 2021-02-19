@@ -46,7 +46,7 @@
   #:use-module (gnu packages curl)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages ibus)
-
+  #:use-module (gnu packages wget)
   ;;(use-service-modules desktop networking ssh xorg)
   #:use-module (gnu services base)
   #:use-module (gnu services desktop)
