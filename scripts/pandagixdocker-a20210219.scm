@@ -24,7 +24,7 @@
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages guile)
-  ;;#:use-module (gnu packages linux) ; might conflict with (nongnu packages linux)
+  #:use-module (gnu packages linux) ; might conflict with (nongnu packages linux)
   #:use-module (gnu packages package-management)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages xorg)
@@ -34,8 +34,8 @@
   #:use-module (gnu packages less)
   #:use-module (gnu packages nvi)
   ;;;;added for non-libre linux
-  #:use-module (nongnu packages linux) ; channel inferior
-  #:use-module (nongnu system linux-initrd)
+  ;;#:use-module (nongnu packages linux) ; channel inferior
+  ;;#:use-module (nongnu system linux-initrd)
   #:use-module (srfi srfi-1)
   #:use-module (guix channels) 
   #:use-module (guix inferior)
