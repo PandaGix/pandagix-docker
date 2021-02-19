@@ -49,9 +49,9 @@ RUN source "${GUIX_PROFILE}/etc/profile" \
     && "${GUIX_PROFILE}/bin/guix" --version \
     && "${GUIX_PROFILE}/bin/guix" describe \
     && "${GUIX_PROFILE}/bin/guix" gc \
-    #&& "${GUIX_PROFILE}/bin/guix" pull \
+    #&& "${GUIX_PROFILE}/bin/guix" pull --allow-downgrades \
     #&& "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
-    && cp -a "$(${GUIX_PROFILE}/bin/guix system docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
+    && cp -a "$(${GUIX_PROFILE}/bin/guix system --fallback docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
              "${WORK_D}/${GUIX_IMG_NAME}"
 
 
