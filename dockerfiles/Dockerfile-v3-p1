@@ -2,7 +2,7 @@
 # --------------
 
 #FROM alpine:3.12.3 AS build
-FROM pandagix/alpine-pandagix-docker:279889 AS build
+FROM pandagix/alpine-pandagix-docker:2021.0219 AS build
 # guix channel commit dffc918, used for ci.guix.gnu.org Build ID 279889, date 20200206
 # nonguix channel commit 73b11e7, linux 5.10.14 and 5.4.96, date 20200208
 
@@ -37,10 +37,10 @@ RUN apk add --no-cache busybox-static jq tar
 
 ENV USER="root"
 
-#COPY scripts/channels.scm-279989 "${GUIX_CONFIG}/channels.scm"
-COPY scripts/system.scm-with-nss "${WORK_D}/system.scm"
+COPY scripts/channels-a20210219.scm "${GUIX_CONFIG}/channels.scm"
+COPY scripts/pandagixdocker-a20210219.scm "${WORK_D}/system.scm"
 
-# since pandagix/alpine-pandagix-docker:279889 is used,
+# since pandagix/alpine-pandagix-docker:2021.0219 is used,
 # guix pull is NOT needed, hash guix is needed.
 
 RUN source "${GUIX_PROFILE}/etc/profile" \
