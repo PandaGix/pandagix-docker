@@ -21,6 +21,9 @@ ARG PROFILE_D=/etc/profile.d
 ARG INIT_D=/etc/init.d
 ARG ENTRY_D=/root
 
+#added to resolve guix substitute problem on nss-certs 
+ARG LC_ALL=en_US.utf8
+
 
 # Alpine Package requirements
 # ^^^^^^^^^^^^^^^^^^^^
@@ -49,8 +52,8 @@ RUN source "${GUIX_PROFILE}/etc/profile" \
     && "${GUIX_PROFILE}/bin/guix" gc \
     #&& "${GUIX_PROFILE}/bin/guix" pull --allow-downgrades \
     && "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
-    #&& "${GUIX_PROFILE}/bin/guix" install --fallback glibc-utf8-locales \
-    && "${GUIX_PROFILE}/bin/guix" install --fallback glibc-locales \
+    && "${GUIX_PROFILE}/bin/guix" install --fallback glibc-utf8-locales \
+    #&& "${GUIX_PROFILE}/bin/guix" install --fallback glibc-locales \
     && hash guix \
     && cp -a "$(${GUIX_PROFILE}/bin/guix system --fallback docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
              "${WORK_D}/${GUIX_IMG_NAME}"
