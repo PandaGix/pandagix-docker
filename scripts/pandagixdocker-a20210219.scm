@@ -58,6 +58,24 @@
 ;;;; start of the docker-os
 (define pandagix-docker
 (operating-system
+  (host-name "PandaGixDocker")
+  (locale "en_US.utf8")
+  (timezone "UTC")
+  (name-service-switch %mdns-host-lookup-nss)
+  
+  (bootloader (bootloader-configuration
+              (bootloader grub-efi-bootloader)
+              (target "noop")))
+
+  (file-systems (list (file-system
+                      (device "noop")
+                      (mount-point "/")
+                      (type "noop"))))
+
+  (firmware '())
+  (packages (list bash coreutils glibc
+                  findutils grep less nvi procps sed tar
+                  nss-certs git wget ))
 
 )) ; end of (define (operating-system 
 ;;;; feed guix directly

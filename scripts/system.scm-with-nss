@@ -40,16 +40,9 @@
 
  (firmware '())
 
- (packages (list bash-minimal
-                 coreutils-minimal
-                 findutils
-                 grep
-                 less
-                 nvi
-                 procps
-                 sed
-                 tar
-                 nss-certs))
+ (packages (list bash coreutils glibc
+                 findutils grep less nvi procps sed tar
+                 nss-certs git wget ))
 
  (services (list
             ;; Install special files system wide.
