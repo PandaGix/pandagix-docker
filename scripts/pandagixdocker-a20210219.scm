@@ -55,3 +55,10 @@
   #:export (pandagix-docker)
 ) ; end of (define module
 
+;;;; start of the docker-os
+(define pandagix-docker
+(operating-system
+
+)) ; end of (define (operating-system 
+;;;; feed guix directly
+pandagix-docker
