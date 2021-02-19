@@ -3,8 +3,6 @@
 
 #FROM alpine:3.12.3 AS build
 FROM pandagix/alpine-pandagix-docker:2021.0219 AS build
-# guix channel commit dffc918, used for ci.guix.gnu.org Build ID 279889, date 20200206
-# nonguix channel commit 73b11e7, linux 5.10.14 and 5.4.96, date 20200208
 
 
 ARG GUIX_PROFILE="/root/.config/guix/current"
@@ -51,6 +49,7 @@ RUN source "${GUIX_PROFILE}/etc/profile" \
     && "${GUIX_PROFILE}/bin/guix" gc \
     #&& "${GUIX_PROFILE}/bin/guix" pull --allow-downgrades \
     #&& "${GUIX_PROFILE}/bin/guix" package ${GUIX_OPTS} --upgrade \
+    && "${GUIX_PROFILE}/bin/guix" install --fallback glibc-utf8-locales \
     && cp -a "$(${GUIX_PROFILE}/bin/guix system --fallback docker-image ${GUIX_OPTS} ${WORK_D}/system.scm)" \
              "${WORK_D}/${GUIX_IMG_NAME}"
 
